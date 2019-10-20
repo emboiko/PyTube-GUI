@@ -2,10 +2,15 @@
 
 <strong>Basic Installation and Usage:</strong>
 
-Pydub relies on ffmpeg as a dependency, therefore ffmpeg.exe and ffprobe.exe must exist alongside PyTube-GUI.py (avaiable from https://www.ffmpeg.org/download.html)
+python PyTube-GUI.py
+
+<strong>-or-</strong>
+
+Run PyTube-GUI.exe from within it's source directory with a shortcut.
+
+Pydub relies on ffmpeg as a dependency, therefore ffmpeg.exe and ffprobe.exe must exist alongside PyTube-GUI.py (avaiable from https://www.ffmpeg.org/download.html). These are included in /dist with the executable.
 
 Make sure to check out the repositories for pytube and pydub, as their functionality extends far beyond this little application. 
-
 
 <div align=center>
 
