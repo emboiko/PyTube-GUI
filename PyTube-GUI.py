@@ -13,23 +13,26 @@ from os.path import exists, split, splitext
 from platform import system
 from re import sub
 from urllib.error import HTTPError
+
 from pytube import YouTube
 from pydub import AudioSegment
 from validators import url
 
 
-def get_offset(window_width, window_height):
+def get_offset(tk_window):
     """
         Returns an appropriate offset for a given tkinter toplevel,
         such that it always is created center screen on the primary display.
     """
 
-    width_offset=int(
-        (master.winfo_screenwidth() / 2) - (window_width / 2)
+    width_offset = int(
+        (tk_window.winfo_screenwidth() / 2) - (tk_window.winfo_width() / 2)
     )
-    height_offset=int(
-        (master.winfo_screenheight() / 2) - (window_height / 2)
+
+    height_offset = int(
+        (tk_window.winfo_screenheight() / 2) - (tk_window.winfo_height() / 2)
     )
+
     return (width_offset, height_offset)
 
 
@@ -173,7 +176,8 @@ if __name__ == "__main__":
         renders this application mostly useless. For now, this is just a 
         tiny GUI that includes some of the basic functionality of both
         Pytube and Pydub. If a given video fails and returns 403, my best
-        advice for now, is to simply try it with a different link.
+        advice for now, is to simply try it with a different link. This 
+        occurs most often with a video that YouTube considers "music"
     """
 
     master=Tk()
@@ -182,28 +186,19 @@ if __name__ == "__main__":
         master.withdraw()
         messagebox.showwarning(
             "Incompatible platform",
-            "MyTube currently supports Windows platforms only."
+            "Currently supports Windows platforms only."
         )
         quit()
 
-    master_width=450
-    master_height=125
-    master.minsize(width=450, height=125)
-    master.resizable(width=True, height=False)
-
-    (master_width_offset, master_height_offset)=get_offset(
-        master_width, master_height
-    )
-
-    master.title("MyTube")
+    master.title("PyTube-GUI")
     master.iconbitmap("pylogo.ico")
 
-    master.geometry(
-        f"{master_width}"\
-        f"x{master_height}"\
-        f"+{master_width_offset}"\
-        f"+{master_height_offset}"
-    )
+    master.geometry("450x125")
+    master.minsize(width=450, height=125)
+    master.resizable(width=True, height=False)
+    (width_offset, height_offset) = get_offset(master)
+    master.geometry(f"+{width_offset}+{height_offset}")
+    master.update()
 
     master.columnconfigure(0, weight=1)
 
