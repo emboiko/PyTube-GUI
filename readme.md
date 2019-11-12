@@ -1,8 +1,12 @@
 <h1>PyTube-GUI</h1>
 
+<p align="center">
+    <img src="https://i.imgur.com/aVXOsbo.png">
+</p>
+
 <strong>Basic Installation and Usage:</strong>
 
-python PyTube-GUI.py
+`python PyTube-GUI.py`
 
 <strong>-or-</strong>
 
