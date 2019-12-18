@@ -271,7 +271,7 @@ def clean_file_name(file_name):
         Returns a string free of characters restricted for Windows filenames.
     """
 
-    return sub("\\\\|/|:|\*|\?|\"|'|>|<|\|","", file_name)
+    return sub("\\\\|/|:|\*|\?|\"|'|>|<|\.","", file_name)
 
 
 def main():
