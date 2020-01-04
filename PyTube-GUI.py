@@ -147,6 +147,7 @@ class PytubeGUI:
         """
         
         self.update_status_label("Select Stream")
+        self.stream_list.delete(0,"end")
         self.master.resizable(width=True, height=True)
         self.master.geometry("450x250")
         self.stream_list.grid(row=5,column=0, columnspan=2, sticky="nsew")
@@ -170,6 +171,7 @@ class PytubeGUI:
         path = directory + "/" + clean_file_name(unescape(hq_stream.title)) + ".mp4"
         (filename, full_path) = name_file(path)
 
+        #Try to get video stream first:
         try:
             hq_path = hq_stream.download(directory, filename=filename+" VIDEO")
         except HTTPError as err:
@@ -184,27 +186,29 @@ class PytubeGUI:
                 f"{err}"
             )
             
-
-        try:
-            audio_path = audio_stream = yt_vid \
-                .streams \
-                .filter(only_audio=True, subtype="mp4") \
-                .order_by("abr") \
-                .desc() \
-                .first() \
-                .download(directory, filename=filename+" AUDIO")
-        except HTTPError as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}\n https://github.com/nficano/pytube/issues/399"
-            )
+        #If we have the video stream, then go for the audio as well:
+        if hq_path:
+            try:
+                audio_path = audio_stream = yt_vid \
+                    .streams \
+                    .filter(only_audio=True, subtype="mp4") \
+                    .order_by("abr") \
+                    .desc() \
+                    .first() \
+                    .download(directory, filename=filename+" AUDIO")
+            except HTTPError as err:
+                messagebox.showwarning(
+                    "Error",
+                    f"{err}\n https://github.com/nficano/pytube/issues/399"
+                )
+                
+            except Exception as err:
+                messagebox.showwarning(
+                    "Error",
+                    f"{err}"
+                )
             
-        except Exception as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}"
-            )
-        
+        #If we get here with both, zip them:
         if hq_path and audio_path:
             run([
                 f"ffmpeg",
@@ -217,6 +221,7 @@ class PytubeGUI:
                 full_path
             ])
 
+        #Cleanup
         if hq_path:
             run(["del", hq_path],shell=True)
         if audio_path:
