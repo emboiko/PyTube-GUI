@@ -29,7 +29,7 @@ class PytubeGUI:
     """
         Minimalist GUI for pytube
     """
-    
+
     def __init__(self, root):
         self.master = root
 
@@ -177,14 +177,13 @@ class PytubeGUI:
                 "Error",
                 f"{err}\n https://github.com/nficano/pytube/issues/399"
             )
-            return
-        
+            
         except Exception as err:
             messagebox.showwarning(
                 "Error",
                 f"{err}"
             )
-            return
+            
 
         try:
             audio_path = audio_stream = yt_vid \
@@ -194,13 +193,17 @@ class PytubeGUI:
                 .desc() \
                 .first() \
                 .download(directory, filename=filename+" AUDIO")
-
+        except HTTPError as err:
+            messagebox.showwarning(
+                "Error",
+                f"{err}\n https://github.com/nficano/pytube/issues/399"
+            )
+            
         except Exception as err:
             messagebox.showwarning(
                 "Error",
                 f"{err}"
             )
-            return
         
         if hq_path and audio_path:
             run([
@@ -214,7 +217,9 @@ class PytubeGUI:
                 full_path
             ])
 
+        if hq_path:
             run(["del", hq_path],shell=True)
+        if audio_path:
             run(["del", audio_path],shell=True)
 
 
