@@ -12,7 +12,6 @@ from tkinter import (
 from tkinter.filedialog import askdirectory
 from os.path import exists, split, splitext
 from urllib.error import HTTPError
-from platform import system
 from re import sub, findall
 from subprocess import run
 from html import unescape
@@ -139,6 +138,11 @@ class PytubeGUI:
         self.dir_entry_button.grid(row=3, column=1)    
 
         self.link_entry.bind("<Return>", self.submit)
+        self.master.protocol("WM_DELETE_WINDOW", self.close)
+
+
+    def __str__(self):
+        return f"PyTube-GUI @ {hex(id(self))}"
 
 
     def hq_download(self, yt_vid, directory):
@@ -156,12 +160,20 @@ class PytubeGUI:
         self.stream_list.bind("<Return>", self.update_stream_selection)
         self.stream_list.bind("<Double-Button-1>", self.update_stream_selection)
         
-        streams = yt_vid.streams.filter(adaptive=True, subtype="mp4").all()
+        streams = yt_vid.streams.filter(
+            adaptive=True,
+            type="video",
+            subtype="mp4"
+        ).all()
+
         for stream in streams:
             self.stream_list.insert("end",stream)
 
         self.master.update()
         self.master.wait_variable(self.stream_selection)
+
+        if self.stream_selection.get() == "__NONE__":
+            return self.stream_selection.get()
 
         itag = findall("itag=\"\d*\"", self.stream_selection.get())
         itag = sub("itag=\"|\"","",itag[0])
@@ -324,7 +336,9 @@ class PytubeGUI:
             return
 
         if self.mode.get() == "HQ":
-            self.hq_download(yt_vid, directory)
+            result = self.hq_download(yt_vid, directory)
+            if result == "__NONE__":
+                return
         else:
             self.download(yt_vid, directory)
 
@@ -338,6 +352,11 @@ class PytubeGUI:
         self.update_status_label("Ready")
         self.stream_list.delete(0,"end")
         self.link_entry.delete(0, "end")
+
+
+    def close(self):
+        self.stream_selection.set("__NONE__")
+        self.master.destroy()
 
 
     def update_stream_selection(self,*args):
