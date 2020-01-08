@@ -123,7 +123,7 @@ class PytubeGUI:
         self.stream_list_y_scroll.config(command=self.stream_list.yview)
         self.stream_selection = StringVar(self.master)
 
-        #Layout
+        #Layout:
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(5, weight=1)
 
@@ -137,12 +137,37 @@ class PytubeGUI:
         self.dir_entry_x_scroll.grid(row=4, column=0, sticky="ew")
         self.dir_entry_button.grid(row=3, column=1)    
 
+        #Bindings, Traces, Protocols:
         self.link_entry.bind("<Return>", self.submit)
+        self.stream_list.bind("<Return>", self.update_stream_selection)
+        self.stream_list.bind("<Double-Button-1>", self.update_stream_selection)
+        self.mode.trace("w", self.set_gui)
         self.master.protocol("WM_DELETE_WINDOW", self.close)
 
 
     def __str__(self):
+        """
+            Pretty print self w/ address
+        """
+        
         return f"PyTube-GUI @ {hex(id(self))}"
+
+
+    def set_gui(self, *args):
+        """
+            Swap between GUI layouts (Stream list / No stream list)
+        """
+
+        if self.mode.get() == "HQ":
+            self.master.resizable(width=True, height=True)
+            self.master.geometry("450x250")
+            self.stream_list.grid(row=5,column=0, columnspan=2, sticky="nsew")
+            self.master.resizable(width=True, height=False)
+        else:
+            self.master.resizable(width=True, height=True)
+            self.master.geometry("450x125")
+            self.stream_list.grid_remove()
+            self.master.resizable(width=True, height=False)
 
 
     def hq_download(self, yt_vid, directory):
@@ -152,13 +177,6 @@ class PytubeGUI:
         
         self.update_status_label("Select Stream")
         self.stream_list.delete(0,"end")
-        self.master.resizable(width=True, height=True)
-        self.master.geometry("450x250")
-        self.stream_list.grid(row=5,column=0, columnspan=2, sticky="nsew")
-        self.master.resizable(width=True, height=False)
-
-        self.stream_list.bind("<Return>", self.update_stream_selection)
-        self.stream_list.bind("<Double-Button-1>", self.update_stream_selection)
         
         streams = yt_vid.streams.filter(
             adaptive=True,
@@ -233,10 +251,7 @@ class PytubeGUI:
                 full_path
             ])
 
-        #Cleanup
-        if hq_path:
             run(["del", hq_path],shell=True)
-        if audio_path:
             run(["del", audio_path],shell=True)
 
 
@@ -342,21 +357,19 @@ class PytubeGUI:
         else:
             self.download(yt_vid, directory)
 
-        self.stream_list.grid_remove()
-        self.stream_list_y_scroll.grid_remove()
-
-        self.master.resizable(width=True, height=True)
-        self.master.geometry("450x125")
-        self.master.resizable(width=True, height=False)
-
         self.update_status_label("Ready")
         self.stream_list.delete(0,"end")
         self.link_entry.delete(0, "end")
 
 
     def close(self):
+        """
+            Callback for window close, satisfies wait_variable()
+            before killing the application.
+        """
+        
         self.stream_selection.set("__NONE__")
-        self.master.destroy()
+        raise SystemExit
 
 
     def update_stream_selection(self,*args):
