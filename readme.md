@@ -8,6 +8,10 @@
 
 <strong>Basic Installation and Usage:</strong>
 
+- `pip install pytube3`
+- `pip install pydub`
+- `pip install validators`
+
 `python PyTube-GUI.py`
 
 <strong>-or-</strong>
@@ -20,11 +24,15 @@ Make sure to check out the repositories for pytube and pydub, as their functiona
 
 <div align=center>
 
-pytube:
+**pytube:**
 
 https://github.com/nficano/pytube
 
-pydub:
+**pytube3:**
+
+https://github.com/hbmartin/pytube3
+
+**pydub:**
 
 https://github.com/jiaaro/pydub
 
