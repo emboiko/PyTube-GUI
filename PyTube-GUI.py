@@ -404,7 +404,7 @@ class PytubeGUI:
         self.status_label.update()
 
 
-    def progress(self, stream, chunk, file_handle, bytes_remaining):
+    def progress(self, stream, chunk, bytes_remaining):
         """
             Callback for download progress
         """
