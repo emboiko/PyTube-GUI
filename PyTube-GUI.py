@@ -15,6 +15,7 @@ from urllib.error import HTTPError
 from re import sub, findall
 from subprocess import run
 from html import unescape
+from functools import wraps
 
 from pydub import AudioSegment
 from pytube import YouTube
@@ -182,7 +183,7 @@ class PytubeGUI:
             adaptive=True,
             type="video",
             subtype="mp4"
-        ).all()
+        )
 
         for stream in streams:
             self.stream_list.insert("end",stream)
@@ -292,6 +293,30 @@ class PytubeGUI:
                 audio.export(full_path, format="mp4")
 
 
+    def disabled_ui(fn):
+        """
+            Wrapper for submit() that prevents accidental repeat downloads.
+
+            If we spam click submit, we'll end up with a bunch of duplicates, which
+            probably isn't desirable. 
+        """
+
+        @wraps(fn)
+        def inner(self, *args, **kwargs):
+
+            self.link_entry_button.config(state="disabled")
+
+            fn(self, *args, **kwargs)
+
+            self.update_status_label("Ready")
+            self.stream_list.delete(0,"end")
+            self.link_entry.delete(0, "end")
+            self.link_entry_button.config(state="normal")
+        
+        return inner
+
+
+    @disabled_ui
     def submit(self):
         """
             Controller/handler for download() & hq_download()
@@ -317,21 +342,16 @@ class PytubeGUI:
                 "Error",
                 f"{err}\n"
                 "https://github.com/nficano/pytube/issues/536\n"\
-                "https://github.com/nficano/pytube/pull/537\n"\
-                "Sometimes retrying with the same link actually works."
+                "https://github.com/nficano/pytube/pull/537"
             )
-            self.update_status_label("Ready")
-            self.link_entry.selection_range(0,"end")
             return
 
         except Exception as err:
             #Same as above, capture & return
             messagebox.showwarning(
                 "Invalid Link",
-                "Unable to fetch video."
+                f"Unable to fetch video.\n{err}"
             )
-            self.update_status_label("Ready")
-            self.link_entry.selection_range(0,"end")
             return
 
         yt_vid.register_on_progress_callback(self.progress)
@@ -346,8 +366,6 @@ class PytubeGUI:
                 "The specified directory cannot be found."
             )
             #Maybe create the directory instead?
-            self.dir_entry.selection_range(0, "end")
-            self.update_status_label("Ready")
             return
 
         if self.mode.get() == "HQ":
@@ -356,10 +374,6 @@ class PytubeGUI:
                 return
         else:
             self.download(yt_vid, directory)
-
-        self.update_status_label("Ready")
-        self.stream_list.delete(0,"end")
-        self.link_entry.delete(0, "end")
 
 
     def close(self):
