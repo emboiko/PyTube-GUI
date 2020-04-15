@@ -28,13 +28,8 @@ Make sure to check out the repositories for pytube and pydub, as their functiona
 
 https://github.com/nficano/pytube
 
-**pytube3:**
-
-https://github.com/hbmartin/pytube3
-
 **pydub:**
 
 https://github.com/jiaaro/pydub
 
 <div>
-

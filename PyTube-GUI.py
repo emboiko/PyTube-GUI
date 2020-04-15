@@ -143,6 +143,7 @@ class PytubeGUI:
         self.stream_list.bind("<Return>", self.update_stream_selection)
         self.stream_list.bind("<Double-Button-1>", self.update_stream_selection)
         self.mode.trace("w", self.set_gui)
+        self.master.bind("<Control-w>", self.close)
         self.master.protocol("WM_DELETE_WINDOW", self.close)
 
 
@@ -205,17 +206,9 @@ class PytubeGUI:
         #Try to get video stream first:
         try:
             hq_path = hq_stream.download(directory, filename=filename+" VIDEO")
-        except HTTPError as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}\n https://github.com/nficano/pytube/issues/399"
-            )
-            
+
         except Exception as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}"
-            )
+            messagebox.showwarning("Error", err)
             
         #If we have the video stream, then go for the audio as well:
         if hq_path:
@@ -227,17 +220,9 @@ class PytubeGUI:
                     .desc() \
                     .first() \
                     .download(directory, filename=filename+" AUDIO")
-            except HTTPError as err:
-                messagebox.showwarning(
-                    "Error",
-                    f"{err}\n https://github.com/nficano/pytube/issues/399"
-                )
-                
+
             except Exception as err:
-                messagebox.showwarning(
-                    "Error",
-                    f"{err}"
-                )
+                messagebox.showwarning("Error", err)
             
         #If we get here with both, zip them:
         if hq_path and audio_path:
@@ -272,17 +257,8 @@ class PytubeGUI:
         try:
             stream.download(directory, filename=filename)
 
-        except HTTPError as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}\n https://github.com/nficano/pytube/issues/399"
-            )
-        
         except Exception as err:
-            messagebox.showwarning(
-                "Error",
-                f"{err}"
-            )
+            messagebox.showwarning("Error", err)
 
         else:
             if self.mode.get() == "Audio Only":
@@ -337,23 +313,15 @@ class PytubeGUI:
         try:
             yt_vid = YouTube(self.link_entry.get())
         except KeyError as err:
-            #Not sure what to do here other than just capture & return
-            messagebox.showwarning(
-                "Error",
-                f"{err}\n"
-                "https://github.com/nficano/pytube/issues/536\n"\
-                "https://github.com/nficano/pytube/pull/537"
-            )
-            return
+            return messagebox.showwarning("KeyError", err)
 
         except Exception as err:
             #Same as above, capture & return
-            messagebox.showwarning(
+            return messagebox.showwarning(
                 "Invalid Link",
                 f"Unable to fetch video.\n{err}"
             )
-            return
-
+            
         yt_vid.register_on_progress_callback(self.progress)
 
         directory = self.dir_entry.get() or self.dir_select()
@@ -361,12 +329,10 @@ class PytubeGUI:
             self.update_status_label("Ready")
             return
         if not exists(directory):
-            messagebox.showwarning(
+            return messagebox.showwarning(
                 "Invalid Path",
                 "The specified directory cannot be found."
             )
-            #Maybe create the directory instead?
-            return
 
         if self.mode.get() == "HQ":
             result = self.hq_download(yt_vid, directory)
@@ -376,7 +342,7 @@ class PytubeGUI:
             self.download(yt_vid, directory)
 
 
-    def close(self):
+    def close(self, event=None):
         """
             Callback for window close, satisfies wait_variable()
             before killing the application.
