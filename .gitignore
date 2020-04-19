@@ -7,5 +7,5 @@ ffmpeg.exe
 ffprobe.exe
 LICENSE.txt
 build
-build.txt
+build.bat
 PyTube-GUI.spec

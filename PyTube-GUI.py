@@ -224,6 +224,7 @@ class PytubeGUI:
             except Exception as err:
                 messagebox.showwarning("Error", err)
             
+        print(full_path)
         #If we get here with both, zip them:
         if hq_path and audio_path:
             run([
@@ -435,10 +436,10 @@ def name_file(full_path):
 
 def clean_file_name(file_name):
     """
-        Returns a string free of characters restricted for Windows filenames.
+        Returns a string free of characters restricted for Windows (and ffmpeg).
     """
 
-    return sub("\\\\|/|:|\*|\?|\"|'|>|<|\.","", file_name)
+    return sub("\\\\|/|:|\*|\?|\"|'|>|<|\.|\|","", file_name)
 
 
 def main():
