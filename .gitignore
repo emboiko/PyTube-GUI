@@ -5,7 +5,6 @@
 /tcl
 ffmpeg.exe
 ffprobe.exe
-LICENSE.txt
 build
 build.bat
 PyTube-GUI.spec
