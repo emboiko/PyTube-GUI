@@ -8,17 +8,14 @@
 
 <strong>Basic Installation and Usage:</strong>
 
-- `pip install pytube3`
-- `pip install pydub`
-- `pip install validators`
-
-`python PyTube-GUI.py`
+- `pip install requirements.txt`
+- `python PyTube-GUI.py`
 
 <strong>-or-</strong>
 
 Run PyTube-GUI.exe from within it's source directory with a shortcut.
 
-This application relies on ffmpeg as a dependency, therefore ffmpeg.exe and ffprobe.exe must exist alongside PyTube-GUI.py (Usually include on system PATH (avaiable from https://www.ffmpeg.org/download.html)).
+This application relies on [ffmpeg](https://www.ffmpeg.org/download.html), therefore ffmpeg.exe and ffprobe.exe must exist alongside PyTube-GUI.py (Usually include on system PATH).
 
 Make sure to check out the repositories for pytube and pydub, as their functionality extends far beyond this little application. 
 
