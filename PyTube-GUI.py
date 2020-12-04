@@ -11,7 +11,6 @@ from tkinter import (
 )
 from tkinter.filedialog import askdirectory
 from os.path import exists, split, splitext
-from urllib.error import HTTPError
 from re import sub, findall
 from subprocess import run
 from html import unescape
@@ -204,6 +203,7 @@ class PytubeGUI:
         (filename, full_path) = name_file(path)
 
         #Try to get video stream first:
+        hq_path = None
         try:
             hq_path = hq_stream.download(directory, filename=filename+" VIDEO")
 
@@ -211,9 +211,11 @@ class PytubeGUI:
             messagebox.showwarning("Error", err)
             
         #If we have the video stream, then go for the audio as well:
+
+        audio_path = None
         if hq_path:
             try:
-                audio_path = audio_stream = yt_vid \
+                audio_path = yt_vid \
                     .streams \
                     .filter(only_audio=True, subtype="mp4") \
                     .order_by("abr") \
@@ -224,7 +226,6 @@ class PytubeGUI:
             except Exception as err:
                 messagebox.showwarning("Error", err)
             
-        print(full_path)
         #If we get here with both, zip them:
         if hq_path and audio_path:
             run([
