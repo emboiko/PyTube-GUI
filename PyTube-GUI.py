@@ -15,6 +15,7 @@ from re import sub, findall
 from subprocess import run
 from html import unescape
 from functools import wraps
+from shutil import which
 
 from pydub import AudioSegment
 from pytube import YouTube
@@ -145,6 +146,17 @@ class PytubeGUI:
         self.master.bind("<Control-w>", self.close)
         self.master.protocol("WM_DELETE_WINDOW", self.close)
 
+        #Probe ffmpeg:
+        self.ffmpeg = which("ffmpeg")
+        if not self.ffmpeg:
+            messagebox.showwarning(
+                "Error", 
+                "Unable to probe ffmpeg.\n\n"\
+                "HQ & Audio Only most likely will not function "\
+                "correctly without ffmpeg.exe on the system path."
+            )
+            self.mode_menu.config(state="disabled")
+
 
     def __str__(self):
         """
@@ -175,7 +187,7 @@ class PytubeGUI:
         """
             Slower download rate on average, higher resolution + ffmpeg zip
         """
-        
+
         self.update_status_label("Select Stream")
         self.stream_list.delete(0,"end")
         
@@ -265,7 +277,7 @@ class PytubeGUI:
         else:
             if self.mode.get() == "Audio Only":
                 #Audio only streams download rather slowly via pytube,
-                #therefore, we take the audio in place w/ pydub & ffmpeg:
+                #therefore, we take the audio in place w/ pydub:
                 self.update_status_label("Extracting Audio...")
                 audio = AudioSegment.from_file(full_path)
                 audio.export(full_path, format="mp4")
@@ -337,9 +349,7 @@ class PytubeGUI:
             )
 
         if self.mode.get() == "HQ":
-            result = self.hq_download(yt_vid, directory)
-            if result == "__NONE__":
-                return
+            self.hq_download(yt_vid, directory)
         else:
             self.download(yt_vid, directory)
 
@@ -452,7 +462,7 @@ def main():
     """
 
     root = Tk()
-    pytube_gui = PytubeGUI(root)
+    PytubeGUI(root)
     root.mainloop()
 
 
